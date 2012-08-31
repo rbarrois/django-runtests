@@ -4,7 +4,9 @@
 
 
 from __future__ import unicode_literals
+
 import optparse
+import os
 import sys
 
 from django.conf import settings as django_settings
@@ -45,6 +47,8 @@ class RunTests(object):
     DEFAULT_DB_PASSWORD = ''
     DEFAULT_DB_HOST = ''
     DEFAULT_DB_PORT = ''
+
+    BASE_PATH = ''
 
     def __init__(self):
         self.app_names = set(app.split('.')[-1] for app in self.TESTED_APPS)
@@ -100,6 +104,8 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
         """Prepare the option parser."""
         usage = self.get_usage()
         parser = optparse.OptionParser(usage=usage)
+        parser.add_option('--no-alter-path', action='store_true', default=False,
+            dest='no_alter_path', help="Don't alter sys.path for tests")
 
         parser.add_option_group(self.make_db_options(parser))
         parser.add_option_group(self.make_output_options(parser))
@@ -178,6 +184,9 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
     def setup_test_environment(self, options):
         """Setup the test environment from the given options."""
         settings = self.make_settings(options)
+        if self.BASE_PATH and not options.no_alter_path:
+            self.info("Inserting %s on sys.path", self.BASE_PATH)
+            sys.path.insert(0, os.path.abspath(self.BASE_PATH))
         django_settings.configure(**settings)
 
     def get_runner(self, options):
