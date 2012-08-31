@@ -64,17 +64,17 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
         db_options.add_option('--db-engine', dest='db_engine',
             help="Use DBENGINE database engine. Valid options are %s or other "
             "relevant values for the 'ENGINE' setting" % ', '.join(DB_ENGINES),
-            metavar=DBENGINE)
+            metavar='DBENGINE')
         db_options.add_option('--db-name', dest='db_name',
-            help='Connect to DBNAME database', metavar=DBNAME)
+            help='Connect to DBNAME database', metavar='DBNAME')
         db_options.add_option('--db-user', dest='db_user',
-            help='Connect to database using DBUSER role', metavar=DBUSER)
+            help='Connect to database using DBUSER role', metavar='DBUSER')
         db_options.add_option('--db-password', dest='db_password',
-            help='Connect to database with DBPASSWORD', metavar=DBPASSWORD)
+            help='Connect to database with DBPASSWORD', metavar='DBPASSWORD')
         db_options.add_option('--db-host', dest='db_host',
-            help='Connect to database at DBHOST', metavar=DBHOST)
+            help='Connect to database at DBHOST', metavar='DBHOST')
         db_options.add_option('--db-port', dest='db_port',
-            help='Connect to database port DBPORT', metavar=DBPORT)
+            help='Connect to database port DBPORT', metavar='DBPORT')
         return db_options
 
     def make_output_options(self, parser):
@@ -96,7 +96,6 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
         """Prepare the option parser."""
         usage = self.get_usage()
         parser = optparse.OptionParser(usage=usage)
-        parser.add_option('-v', '--verbose', action='store_true', dest='verbosity', help='Increase test verbosity')
 
         parser.add_option_group(self.make_db_options(parser))
         parser.add_option_group(self.make_output_options(parser))
