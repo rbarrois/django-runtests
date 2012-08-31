@@ -47,7 +47,11 @@ class RunTests(object):
     DEFAULT_DB_PORT = ''
 
     def __init__(self):
-        self.app_names = [app.split('.')[-1] for app in self.TESTED_APPS]
+        self.app_names = set(app.split('.')[-1] for app in self.TESTED_APPS)
+
+    def info(self, msg, *args):
+        line = msg + '\n'
+        sys.stdout.write(line % args)
 
     def get_usage(self):
         """Prepare the usage string"""
@@ -200,7 +204,9 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
         self.check_apps(apps)
         self.setup_test_environment(options)
         runner = self.get_runner(options)
-        runner.run_tests(apps or self.app_names)
+        apps_to_tests = sorted(apps or self.app_names)
+        self.info("Running tests for %s", ', '.join(apps_to_tests))
+        runner.run_tests(apps_to_tests)
 
     @classmethod
     def runtests(cls, argv=()):
