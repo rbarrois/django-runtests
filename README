@@ -1,0 +1,53 @@
+django-runtests
+===============
+
+Eases the writing of a ``runtests.py`` script for pluggable django application.
+
+
+Such scripts usually provide a ``runtests()`` method that handle the test running behaviour.
+
+
+Installation
+------------
+
+- Globally::
+
+    $ pip install django-runtests
+
+- From the package's ``setup.py`` file (using Distribute)::
+
+    setup(
+        test_requires=[
+            'django-runtests',
+        ],
+        test_suite='runtests.runtests',
+    )
+
+
+Defining the test setup
+-----------------------
+
+In your ``runtests.py`` file, add the following code::
+
+    import django_runtests
+
+    class Tests(django_runtests.RunTests):
+        TESTED_APPS = ['my.app.to.test', 'my.other.test']
+
+        EXTRA_APPS = [
+            'django.contrib.auth',
+            # Other custom apps to include
+        ]
+
+        EXTRA_SETTINGS = {
+            # Custom settings, as a dict
+        }
+
+    def runtests():
+        return Tests.runtests()
+
+    if __name__ == '__main__':
+        Tests.main()
+
+
+.. vim:set ft=rst:
