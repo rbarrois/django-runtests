@@ -228,7 +228,7 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
     def runtests(cls, argv=()):
         """Run the tests with a given argv."""
         runner = cls()
-        return runner.run(argv)
+        return runner.run(argv or [])
 
     @classmethod
     def main(cls):
