@@ -10,6 +10,7 @@ import os
 import sys
 
 from django.conf import settings as django_settings
+from django.utils import crypto
 
 
 #: Shortcut for --db-engine options.
@@ -151,7 +152,9 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
 
     def make_secret_key(self):
         """Generate a secret key."""
-        return 'FOO'
+        # Shamelessly stolen from django.core.management.commands.startproject
+        chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+        return crypto.get_random_string(50, chars)
 
     def make_settings(self, options):
         """Prepare the settings from the given set of options.
