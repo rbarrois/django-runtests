@@ -132,7 +132,7 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
         The main use of `parser` is for `parser.error()` calls
         """
         for app in apps:
-            if app not in self.app_names:
+            if app.split('.')[0] not in self.app_names:
                 parser.error("Invalid application %s" % app)
 
     def parse_options(self, argv):
