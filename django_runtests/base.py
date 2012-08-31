@@ -106,6 +106,10 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
         parser = optparse.OptionParser(usage=usage)
         parser.add_option('--no-alter-path', action='store_true', default=False,
             dest='no_alter_path', help="Don't alter sys.path for tests")
+        parser.add_option('--noinput', action='store_false', default=True,
+            dest='interactive', help="No input")
+        parser.add_option('--failfast', action='store_true', default=False,
+            dest='fail_fast', help="Abort tests at the first failure")
 
         parser.add_option_group(self.make_db_options(parser))
         parser.add_option_group(self.make_output_options(parser))
@@ -199,7 +203,7 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
             verbosity = 0
         else:
             verbosity = 1
-        return DjangoTestSuiteRunner(verbosity=verbosity, interactive=True, failfast=False)
+        return DjangoTestSuiteRunner(verbosity=verbosity, interactive=options.interactive, failfast=options.fail_fast)
 
     def run(self, argv):
         """Main entry point for the RunTests instance.
