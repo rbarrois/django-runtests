@@ -103,6 +103,7 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
 
         parser.add_option_group(self.make_db_options(parser))
         parser.add_option_group(self.make_output_options(parser))
+        return parser
 
 
     def enhance_parser(self, parser):
@@ -158,7 +159,7 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
             'DATABASES': {
                 'default': {
                     'ENGINE': DB_ENGINES.get(options.db_engine or self.DEFAULT_DB_ENGINE, options.db_engine),
-                    'NAME': option.db_name or self.DEFAULT_DB_NAME,
+                    'NAME': options.db_name or self.DEFAULT_DB_NAME,
                     'USER': options.db_user or self.DEFAULT_DB_USER,
                     'PASSWORD': options.db_password or self.DEFAULT_DB_PASSWORD,
                     'HOST': options.db_host or self.DEFAULT_DB_HOST,
@@ -201,7 +202,6 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
             - Run the tests
         """
         options, apps = self.parse_options(argv)
-        self.check_apps(apps)
         self.setup_test_environment(options)
         runner = self.get_runner(options)
         apps_to_tests = sorted(apps or self.app_names)
@@ -211,7 +211,7 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
     @classmethod
     def runtests(cls, argv=()):
         """Run the tests with a given argv."""
-        runner = RunTests()
+        runner = cls()
         return runner.run(argv)
 
     @classmethod
