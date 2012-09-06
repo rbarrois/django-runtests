@@ -8,9 +8,11 @@ from __future__ import unicode_literals
 import optparse
 import os
 import sys
+import time
 
+import django
 from django.conf import settings as django_settings
-from django.utils import crypto
+from django.utils import crypto, importlib
 
 
 #: Shortcut for --db-engine options.
@@ -187,6 +189,42 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
 
         settings.update(self.EXTRA_SETTINGS)
         return settings
+
+    def _setup_tz(self, timezone):
+        """Shamelessly stolen from django/conf/__init__.py:112"""
+        # When we can, attempt to validate the timezone. If we can't find
+        # this file, no check happens and it's harmless.
+        zoneinfo_root = '/usr/share/zoneinfo'
+        if (os.path.exists(zoneinfo_root) and not
+                os.path.exists(os.path.join(zoneinfo_root, *(timezone.split('/'))))):
+            raise ValueError("Incorrect timezone setting: %s" % timezone)
+        # Move the time zone info into os.environ. See ticket #2315 for why
+        # we don't do this unconditionally (breaks Windows).
+        os.environ['TZ'] = timezone
+        time.tzset()
+
+    def _setup_logging(self, logging_config_handler, logging_config):
+        """Shamelessly stolen from django/conf/__init__.py:125."""
+        # First find the logging configuration function ...
+        logging_config_path, logging_config_func_name = logging_config_handler.rsplit('.', 1)
+        logging_config_module = importlib.import_module(logging_config_path)
+        logging_config_func = getattr(logging_config_module, logging_config_func_name)
+
+        # ... then invoke it with the logging settings
+        logging_config_func(logging_config)
+
+    def configure_settings(self, settings):
+        """Configure the settings.
+
+        Due to Django's bug https://code.djangoproject.com/ticket/18316, we need to
+        replicate part of django.conf.Settings.
+        """
+        django_settings.configure(**settings)
+        if django.VERSION[:2] >= (1, 4):
+            self._setup_tz(django_settings.TIME_ZONE)
+
+        if django_settings.LOGGING_CONFIG:
+            self._setup_logging(django_settings.LOGGING_CONFIG, django_settings.LOGGING)
 
     def setup_test_environment(self, options):
         """Setup the test environment from the given options."""
