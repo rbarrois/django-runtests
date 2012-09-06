@@ -69,6 +69,7 @@ class RunTests(object):
 Run tests for the selected Python apps (if empty, run tests for all apps)
 
 Valid apps: """ + ', '.join(sorted(self.app_names))
+        return usage
 
     def make_db_options(self, parser):
         """Prepare all db-related options."""
