@@ -262,7 +262,7 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
         if self.BASE_PATH and not options.no_alter_path:
             self.info("Inserting %s on sys.path", self.BASE_PATH)
             sys.path.insert(0, os.path.abspath(self.BASE_PATH))
-        django_settings.configure(**settings)
+        self.configure_settings(settings)
 
     def get_runner(self, options):
         """Retrieve the test runner"""
