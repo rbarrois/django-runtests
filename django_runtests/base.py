@@ -53,6 +53,8 @@ class RunTests(object):
 
     BASE_PATH = ''
 
+    DISABLED_LOGGERS = ()
+
     def __init__(self):
         self.app_names = set(app.split('.')[-1] for app in self.TESTED_APPS)
 
@@ -96,6 +98,11 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
             dest='verbose', help='Increase test verbosity')
         output_options.add_option('-q', '--quiet', action='store_true',
             dest='quiet', help='Decrease test verbosity')
+        output_options.add_option('--log-to-stderr', action='store_true',
+            dest='log_to_stderr', help="Send logging output to stderr.")
+        output_options.add_option('--disable-logger', action='append',
+            dest='disabled_loggers', default=list(self.DISABLED_LOGGERS),
+            help="Disable logger LOGGER (repeat for more loggers)")
         output_options.add_option('--report-format', dest='report_format',
             help="Generate reports in FORMAT format", metavar='FORMAT')
         output_options.add_option('--report-destination', dest='report_dest',
@@ -181,11 +188,34 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
                     'PORT': options.db_port or self.DEFAULT_DB_PORT,
                 }
             },
+            'LOGGING': {
+                'version': 1,
+                'formatters': {},
+                'handlers': {
+                    'console': {
+                        'class': 'logging.StreamHandler',
+                        'level': 'INFO',
+                    },
+                    'null': {
+                        'class': 'django.utils.log.NullHandler',
+                    },
+                },
+                'loggers': {},
+                'root': {
+                    'handlers': ['console' if options.log_to_stderr else 'null'],
+                },
+            },
             'SECRET_KEY': secret_key,
             'ROOT_URLCONF': self.URLCONF,
             'STATIC_URL': '/static/',
             'INSTALLED_APPS': self.TESTED_APPS + self.EXTRA_APPS,
         }
+
+        for logger in options.disabled_loggers:
+            settings['LOGGING']['loggers'][logger] = {
+                'handlers': ['null'],
+                'propagate': False,
+            }
 
         settings.update(self.EXTRA_SETTINGS)
         return settings
