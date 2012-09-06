@@ -212,7 +212,7 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
         }
 
         for logger in options.disabled_loggers:
-            settings['LOGGING']['loggers'][logger] = {
+            settings['LOGGING']['loggers'][logger] = {
                 'handlers': ['null'],
                 'propagate': False,
             }
