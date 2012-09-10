@@ -29,25 +29,28 @@ Defining the test setup
 
 In your ``runtests.py`` file, add the following code::
 
-    import django_runtests
-
-    class Tests(django_runtests.RunTests):
-        TESTED_APPS = ['my.app.to.test', 'my.other.test']
-
-        EXTRA_APPS = [
-            'django.contrib.auth',
-            # Other custom apps to include
-        ]
-
-        EXTRA_SETTINGS = {
-            # Custom settings, as a dict
-        }
+    from django_runtests import RunTests
 
     def runtests():
-        return Tests.runtests()
+        return RunTests.runtests()
 
     if __name__ == '__main__':
-        Tests.main()
+        RunTests.main()
 
+
+Tweaking the test setup
+-----------------------
+
+If you need to tweak some parts (updating configuration, adding options, ...), you
+simply have to extend the ``RunTests`` command class::
+
+    import django_runtests
+
+    class RunTests(django_runtests.RunTests):
+
+        def should_test_app(self, app):
+            """Test only applications listed in 'PACKAGE_APPS' setting."""
+            from django.conf import settings
+            return app in settings.PACKAGE_APPS
 
 .. vim:set ft=rst:
