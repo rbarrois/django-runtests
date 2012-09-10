@@ -291,7 +291,8 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
         runner = self.get_runner(options)
         apps_to_tests = sorted(apps or self.app_names)
         self.info("Running tests for %s", ', '.join(apps_to_tests))
-        runner.run_tests(apps_to_tests)
+        return runner.run_tests(apps_to_tests)
+
 
     @classmethod
     def runtests(cls, argv=()):
@@ -302,4 +303,6 @@ Valid apps: """ + ', '.join(sorted(self.app_names))
     @classmethod
     def main(cls):
         """Main entry point, to use from a shell."""
-        return cls.runtests(sys.argv[1:])
+        failures = cls.runtests(sys.argv[1:])
+        if failures:
+            sys.exit(1)
